@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
+import FirebaseCore
 
 @main
 struct officastApp: App {
@@ -15,6 +16,7 @@ struct officastApp: App {
     private let notificationDelegate = AppNotificationDelegate()
 
     init() {
+        FirebaseApp.configure()
         UNUserNotificationCenter.current().delegate = notificationDelegate
         BackgroundRefresh.register(container: sharedModelContainer, settings: AppSettings())
     }

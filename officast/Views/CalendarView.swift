@@ -15,9 +15,19 @@ struct CalendarView: View {
     @Query private var months: [MonthRecord]
 
     @State private var selectedDate: Date?
+    /// Month offset from today: -1 = previous, 0 = current, 1 = next.
+    @State private var monthOffset: Int = 0
+    @State private var holidays = HolidayStore()
+    /// Region holidays (start-of-day) for the focused month, painted red.
+    @State private var holidayDates: Set<Date> = []
 
     private let calendar = Calendar.current
     private let columns = Array(repeating: GridItem(.flexible()), count: 7)
+
+    /// The month currently shown, anchored on today plus `monthOffset`.
+    private var focusedMonth: Date {
+        calendar.date(byAdding: .month, value: monthOffset, to: Date()) ?? Date()
+    }
 
     var body: some View {
         NavigationStack {
@@ -36,7 +46,26 @@ struct CalendarView: View {
                 }
                 .padding()
             }
+            .contentShape(Rectangle())
+            .gesture(monthSwipe)
+            .task(id: monthOffset) {
+                holidayDates = await holidays.load(month: focusedMonth, calendar: calendar)
+            }
             .navigationTitle(Text(monthTitle))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { changeMonth(by: -1) } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                    .disabled(monthOffset <= -1)
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { changeMonth(by: 1) } label: {
+                        Image(systemName: "chevron.right")
+                    }
+                    .disabled(monthOffset >= 1)
+                }
+            }
             .confirmationDialog("calendar.setStatus", isPresented: statusDialogBinding, presenting: selectedDate) { date in
                 ForEach(statusChoices, id: \.self) { status in
                     Button(RecommendationPresentation.statusLabel(status)) {
@@ -49,18 +78,48 @@ struct CalendarView: View {
         }
     }
 
+    // MARK: - Month navigation
+
+    /// Horizontal swipe: drag left → next month, drag right → previous month.
+    private var monthSwipe: some Gesture {
+        DragGesture(minimumDistance: 50)
+            .onEnded { value in
+                guard abs(value.translation.width) > abs(value.translation.height) else { return }
+                changeMonth(by: value.translation.width < 0 ? 1 : -1)
+            }
+    }
+
+    /// Shift the focused month within the allowed -1…1 range.
+    private func changeMonth(by delta: Int) {
+        let next = monthOffset + delta
+        guard (-1...1).contains(next) else { return }
+        withAnimation { monthOffset = next }
+    }
+
+    /// Day-number color: holidays and Sundays are red, Saturdays blue, else primary.
+    private func dayColor(for date: Date) -> Color {
+        if holidayDates.contains(calendar.startOfDay(for: date)) { return .red }
+        switch WorkdayCalculator.isoWeekday(of: date, calendar: calendar) {
+        case 7: return .red   // Sunday
+        case 6: return .blue  // Saturday
+        default: return .primary
+        }
+    }
+
     private func dayCell(_ date: Date) -> some View {
-        let isWeekend = settings.weeklyOffDays.contains(WorkdayCalculator.isoWeekday(of: date, calendar: calendar))
         let status = status(for: date)
         let isToday = calendar.isDateInToday(date)
         let content = VStack(spacing: 2) {
             Text("\(calendar.component(.day, from: date))")
                 .font(.callout)
-                .foregroundStyle(isWeekend ? .secondary : .primary)
-            Circle()
-                .fill(color(for: status))
-                .frame(width: 8, height: 8)
-                .opacity(status == .none ? 0 : 1)
+                .foregroundStyle(dayColor(for: date))
+            if status != .none {
+                Text(RecommendationPresentation.statusLabel(status))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
         }
         .frame(maxWidth: .infinity, minHeight: 44)
         return Button {
@@ -82,7 +141,7 @@ struct CalendarView: View {
     // MARK: - Data
 
     private var currentMonth: MonthRecord? {
-        let key = DateKeys.monthKey(Date(), calendar: calendar)
+        let key = DateKeys.monthKey(focusedMonth, calendar: calendar)
         return months.first { $0.yearMonth == key }
     }
 
@@ -97,6 +156,7 @@ struct CalendarView: View {
         MonthRepository.setStatus(date: date, status: status,
                                   requiredOfficeDays: required, weatherScoreSnapshot: snapshot,
                                   context: context, calendar: calendar)
+        AnalyticsLogger.logAttendanceStatus(status)
     }
 
     private let statusChoices: [AttendanceStatus] =
@@ -104,15 +164,6 @@ struct CalendarView: View {
 
     private var statusDialogBinding: Binding<Bool> {
         Binding(get: { selectedDate != nil }, set: { if !$0 { selectedDate = nil } })
-    }
-
-    private func color(for status: AttendanceStatus) -> Color {
-        switch status {
-        case .officeFull, .officeAM, .officePM: return .green
-        case .wfh: return .blue
-        case .holiday, .vacation: return .orange
-        case .none: return .clear
-        }
     }
 
     // MARK: - Grid layout
@@ -127,19 +178,19 @@ struct CalendarView: View {
         let formatter = DateFormatter()
         formatter.calendar = calendar
         formatter.dateFormat = "yyyy MMMM"
-        return formatter.string(from: Date())
+        return formatter.string(from: focusedMonth)
     }
 
     /// Days of the current month with leading nils to align the first weekday.
     private var gridDays: [Date?] {
-        let today = Date()
-        guard let interval = calendar.dateInterval(of: .month, for: today),
-              let range = calendar.range(of: .day, in: .month, for: today) else { return [] }
+        let month = focusedMonth
+        guard let interval = calendar.dateInterval(of: .month, for: month),
+              let range = calendar.range(of: .day, in: .month, for: month) else { return [] }
         let firstWeekday = calendar.component(.weekday, from: interval.start)
         let leading = (firstWeekday - calendar.firstWeekday + 7) % 7
         var cells: [Date?] = Array(repeating: nil, count: leading)
         for day in range {
-            var comps = calendar.dateComponents([.year, .month], from: today)
+            var comps = calendar.dateComponents([.year, .month], from: month)
             comps.day = day
             cells.append(calendar.date(from: comps))
         }

@@ -107,6 +107,7 @@ struct OnboardingView: View {
         try? context.save()
 
         settings.hasCompletedOnboarding = true
+        AnalyticsLogger.completeOnboarding()
 
         Task {
             if await NotificationScheduler.requestAuthorization() {
