@@ -170,6 +170,13 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "오늘 기록하고 내일 추천 확인" } }
       }
     },
+    "notif.morning.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Before you leave" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "出発前に" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "출발 전에" } }
+      }
+    },
     "notif.title" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Today's check-in" } },

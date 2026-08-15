@@ -30,8 +30,13 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
+            switch phase {
+            case .active:
                 MonthRepository.applyPendingCheckIn(settings: settings, context: context)
+            case .background:
+                BackgroundRefresh.schedule()
+            default:
+                break
             }
         }
     }

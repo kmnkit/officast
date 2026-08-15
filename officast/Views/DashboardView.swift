@@ -126,5 +126,22 @@ struct DashboardView: View {
             requiredOfficeDays: MonthRepository.fetch(monthKey: monthKey, context: context)?.requiredOfficeDays ?? 0,
             context: context)
         await model.refresh(settings: settings, month: month, context: context)
+        if case .loaded(let data) = model.state {
+            scheduleMorningReminder(data)
+        }
+    }
+
+    /// Register the one-shot morning reminder for the next departure with that
+    /// day's recommendation (E2, best-effort).
+    private func scheduleMorningReminder(_ data: DashboardModel.Data) {
+        guard let reminderDate = NotificationScheduler.nextMorningReminderDate(
+            departureHour: settings.departureHour) else { return }
+        let isToday = Calendar.current.isDate(reminderDate, inSameDayAs: Date())
+        let recommendation: DecisionResult? = isToday
+            ? (data.hasTodayForecast ? data.today : nil)
+            : data.tomorrow
+        guard let recommendation else { return }
+        NotificationScheduler.scheduleMorningReminder(
+            at: reminderDate, body: RecommendationPresentation.headline(recommendation))
     }
 }

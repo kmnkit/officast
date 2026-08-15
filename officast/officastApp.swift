@@ -16,6 +16,7 @@ struct officastApp: App {
 
     init() {
         UNUserNotificationCenter.current().delegate = notificationDelegate
+        BackgroundRefresh.register(container: sharedModelContainer, settings: AppSettings())
     }
 
     var sharedModelContainer: ModelContainer = {

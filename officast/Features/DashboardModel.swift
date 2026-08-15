@@ -191,6 +191,15 @@ final class DashboardModel {
         }
     }
 
+    /// Best-effort background refresh: fetch today's home forecast and update the
+    /// cache so the evening notification / offline fallback see fresh data (P2).
+    static func refreshTodayCache(settings: AppSettings, container: ModelContainer, now: Date = Date()) async {
+        let client = OpenMeteoClient()
+        guard let homeByDate = try? await client.fetchDailyHourly(
+            latitude: settings.homeLat, longitude: settings.homeLng, forecastDays: forecastDays) else { return }
+        cacheToday(homeByDate: homeByDate, now: now, calendar: .current, context: ModelContext(container))
+    }
+
     // MARK: - Weather cache (offline fallback)
 
     private static func cacheToday(homeByDate: [Date: [WeatherHour]], now: Date, calendar: Calendar, context: ModelContext) {

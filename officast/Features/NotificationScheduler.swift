@@ -15,6 +15,10 @@ enum NotificationScheduler {
 
     static let categoryId = "DAILY_CHECKIN"
     static let requestIdentifier = "daily-checkin"
+    static let morningIdentifier = "morning-reminder"
+
+    /// Minutes before departure the morning reminder fires.
+    static let morningLeadMinutes = 30
 
     /// Action identifiers map 1:1 to the office/WFH statuses.
     static let actionStatuses: [(id: String, status: AttendanceStatus)] = [
@@ -61,6 +65,43 @@ enum NotificationScheduler {
 
     static func status(forActionId id: String) -> AttendanceStatus? {
         actionStatuses.first { $0.id == id }?.status
+    }
+
+    /// The next departure-minus-lead datetime at or after `now` for `departureHour`.
+    /// Returns nil for a midnight departure (no sensible lead time).
+    static func nextMorningReminderDate(
+        departureHour: Int, now: Date = Date(), calendar: Calendar = .current
+    ) -> Date? {
+        guard departureHour >= 1 else { return nil }
+        var components = DateComponents()
+        components.hour = departureHour
+        components.minute = 0
+        guard let departureToday = calendar.nextDate(
+            after: now.addingTimeInterval(-1), matching: components,
+            matchingPolicy: .nextTime) else { return nil }
+        let reminder = departureToday.addingTimeInterval(TimeInterval(-morningLeadMinutes * 60))
+        // If today's lead time already passed, roll to tomorrow's departure.
+        if reminder <= now {
+            guard let tomorrowDeparture = calendar.date(byAdding: .day, value: 1, to: departureToday) else { return nil }
+            return tomorrowDeparture.addingTimeInterval(TimeInterval(-morningLeadMinutes * 60))
+        }
+        return reminder
+    }
+
+    /// Schedule the one-shot morning reminder at `date` with a concrete body
+    /// (E2, best-effort — only registered while the app is in use).
+    static func scheduleMorningReminder(at date: Date, body: String, calendar: Calendar = .current) {
+        let center = UNUserNotificationCenter.current()
+        center.removePendingNotificationRequests(withIdentifiers: [morningIdentifier])
+
+        let content = UNMutableNotificationContent()
+        content.title = String(localized: "notif.morning.title")
+        content.body = body
+        content.sound = .default
+
+        let components = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+        let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        center.add(UNNotificationRequest(identifier: morningIdentifier, content: content, trigger: trigger))
     }
 }
 
