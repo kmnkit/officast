@@ -35,6 +35,7 @@ struct DashboardView: View {
                 Text(message)
             } actions: {
                 Button("common.retry") { Task { await refresh() } }
+                    .buttonStyle(.glassProminent)
             }
         case .loaded(let data):
             loaded(data)
@@ -42,32 +43,64 @@ struct DashboardView: View {
     }
 
     private func loaded(_ data: DashboardModel.Data) -> some View {
-        List {
-            if data.offline {
-                Label("dashboard.offline", systemImage: "wifi.slash")
-                    .foregroundStyle(.secondary)
-            }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 16) {
+                if data.offline {
+                    Label("dashboard.offline", systemImage: "wifi.slash")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
 
-            Section("dashboard.progress") {
-                LabeledContent("dashboard.officeDone",
-                               value: "\(data.officeDone) / \(data.requiredOfficeDays)")
-                LabeledContent("dashboard.remaining", value: "\(data.remainingWorkdays)")
-                LabeledContent("dashboard.slack", value: "\(data.slack)")
-                if data.slack < 0 {
-                    Label("dashboard.slackWarning", systemImage: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.orange)
+                card("dashboard.progress", glass: false) {
+                    VStack(spacing: 8) {
+                        LabeledContent("dashboard.officeDone",
+                                       value: "\(data.officeDone) / \(data.requiredOfficeDays)")
+                        LabeledContent("dashboard.remaining", value: "\(data.remainingWorkdays)")
+                        LabeledContent("dashboard.slack", value: "\(data.slack)")
+                        if data.slack < 0 {
+                            Label("dashboard.slackWarning", systemImage: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.orange)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                }
+
+                // Today is the one floating glass panel — the screen's focal point.
+                card("dashboard.today", glass: true) {
+                    recommendationRow(data.today, showFlags: true, interpolated: data.todayInterpolated,
+                                      hasForecast: data.hasTodayForecast)
+                }
+
+                if let tomorrow = data.tomorrow {
+                    card("dashboard.tomorrow", glass: false) {
+                        recommendationRow(tomorrow, showFlags: false, interpolated: false, hasForecast: true)
+                    }
                 }
             }
+            .padding()
+        }
+    }
 
-            Section("dashboard.today") {
-                recommendationRow(data.today, showFlags: true, interpolated: data.todayInterpolated,
-                                  hasForecast: data.hasTodayForecast)
-            }
-
-            if let tomorrow = data.tomorrow {
-                Section("dashboard.tomorrow") {
-                    recommendationRow(tomorrow, showFlags: false, interpolated: false, hasForecast: true)
-                }
+    /// A titled content card. `glass` renders the signature Liquid Glass panel;
+    /// otherwise a plain grouped-background card (kept non-glass so the today
+    /// panel is the only glass layer — no glass-on-glass).
+    @ViewBuilder
+    private func card<Content: View>(
+        _ title: LocalizedStringKey, glass: Bool, @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+            let body = content()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding()
+            if glass {
+                body.glassEffect(.regular, in: .rect(cornerRadius: 20))
+            } else {
+                body
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(.rect(cornerRadius: 16))
             }
         }
     }

@@ -13,20 +13,25 @@ struct WeekdaySelector: View {
     private let symbols = Calendar.current.shortWeekdaySymbols  // index 0 = Sunday
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(1...7, id: \.self) { iso in
-                let selected = offDays.contains(iso)
-                Button {
-                    if selected { offDays.remove(iso) } else { offDays.insert(iso) }
-                } label: {
-                    Text(shortSymbol(iso))
-                        .font(.caption.bold())
-                        .frame(maxWidth: .infinity, minHeight: 34)
-                        .background(selected ? Color.accentColor : Color.secondary.opacity(0.15))
-                        .foregroundStyle(selected ? Color.white : Color.primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+        GlassEffectContainer(spacing: 6) {
+            HStack(spacing: 6) {
+                ForEach(1...7, id: \.self) { iso in
+                    let selected = offDays.contains(iso)
+                    Button {
+                        if selected { offDays.remove(iso) } else { offDays.insert(iso) }
+                    } label: {
+                        Text(shortSymbol(iso))
+                            .font(.caption.bold())
+                            .frame(maxWidth: .infinity, minHeight: 34)
+                            .foregroundStyle(selected ? Color.white : Color.primary)
+                    }
+                    .buttonStyle(.plain)
+                    .glassEffect(
+                        selected ? .regular.tint(.accentColor).interactive()
+                                 : .regular.interactive(),
+                        in: .rect(cornerRadius: 8))
+                    .accessibilityAddTraits(selected ? .isSelected : [])
                 }
-                .buttonStyle(.plain)
             }
         }
     }

@@ -52,21 +52,29 @@ struct CalendarView: View {
     private func dayCell(_ date: Date) -> some View {
         let isWeekend = settings.weeklyOffDays.contains(WorkdayCalculator.isoWeekday(of: date, calendar: calendar))
         let status = status(for: date)
+        let isToday = calendar.isDateInToday(date)
+        let content = VStack(spacing: 2) {
+            Text("\(calendar.component(.day, from: date))")
+                .font(.callout)
+                .foregroundStyle(isWeekend ? .secondary : .primary)
+            Circle()
+                .fill(color(for: status))
+                .frame(width: 8, height: 8)
+                .opacity(status == .none ? 0 : 1)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
         return Button {
             selectedDate = date
         } label: {
-            VStack(spacing: 2) {
-                Text("\(calendar.component(.day, from: date))")
-                    .font(.callout)
-                    .foregroundStyle(isWeekend ? .secondary : .primary)
-                Circle()
-                    .fill(color(for: status))
-                    .frame(width: 8, height: 8)
-                    .opacity(status == .none ? 0 : 1)
+            if isToday {
+                // Today floats: glass replaces the flat fill so it reads as the
+                // one focal cell without stacking glass on glass.
+                content.glassEffect(.regular.interactive(), in: .rect(cornerRadius: 8))
+            } else {
+                content
+                    .background(Color.secondary.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
             }
-            .frame(maxWidth: .infinity, minHeight: 44)
-            .background(Color.secondary.opacity(0.08))
-            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
         .buttonStyle(.plain)
     }
