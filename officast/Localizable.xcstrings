@@ -359,6 +359,55 @@
         "ko" : { "stringUnit" : { "state" : "translated", "value" : "재택근무" } }
       }
     },
+    "report.insight" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This month" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "今月の振り返り" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "이번 달 돌아보기" } }
+      }
+    },
+    "report.officeDone" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Office days" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "出社日数" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "출근일수" } }
+      }
+    },
+    "report.progress" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Progress" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "進捗" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "진행" } }
+      }
+    },
+    "report.roughDaysAvoided %lld" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Rough commutes avoided: %lld" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "回避した悪天候通勤: %lld回" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "피한 궂은 통근: %lld회" } }
+      }
+    },
+    "report.roughDaysNote" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Days you worked from home when a poor commute was forecast." } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "通勤が荒れる予報の日に在宅で働いた日数です。" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "통근이 궂을 것으로 예보된 날 재택근무한 횟수입니다." } }
+      }
+    },
+    "report.title" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Report" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "レポート" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "리포트" } }
+      }
+    },
+    "report.wfhCount" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Work-from-home days" } },
+        "ja" : { "stringUnit" : { "state" : "translated", "value" : "在宅日数" } },
+        "ko" : { "stringUnit" : { "state" : "translated", "value" : "재택일수" } }
+      }
+    },
     "settings.locations" : {
       "localizations" : {
         "en" : { "stringUnit" : { "state" : "translated", "value" : "Locations" } },

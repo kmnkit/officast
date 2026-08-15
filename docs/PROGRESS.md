@@ -11,9 +11,9 @@
 | P1b Polish | ✅ 완료 | 빌드/테스트/번들 |
 | P2 Enhancements | ✅ 완료 | 빌드/테스트/plist/실행 |
 | P3 Widget | ⬜ 미착수 | — |
-| P4 Report | ⬜ 미착수 | — |
+| P4 Report | ✅ 완료 | 빌드/테스트/실행(탭 렌더) |
 
-- 테스트: **56개 통과** (전부 순수 로직 + 인메모리 SwiftData)
+- 테스트: **61개 통과** (전부 순수 로직 + 인메모리 SwiftData)
 - 브랜치: `feature/p1-core-loop` (미푸시), 커밋 4개
 - 배포 타겟 iOS 26.5, Swift Testing, 동기화 폴더 그룹(Xcode 16)
 
@@ -52,6 +52,13 @@
 4. **테마**: 기본 SwiftUI 스타일(승인). 색상 폴리시는 dogfooding 후 별도.
 5. **UI 자동화 테스트 없음**: 순수 로직 단위 테스트 + 빌드/실행 스모크로 검증.
 
+### P4 Report
+- `Domain/MonthlyReport.swift`(순수, 골든 테스트): 이번 달 출근 진도·재택 횟수·**"궂은 통근 예보일 재택 N회"** 집계. SwiftData 비의존(`(status, snapshot?)` 배열 입력), `roughCommuteThreshold=70`
+- `Views/ReportView.swift`: 현재 월만(CalendarView와 동일). `@Query` → `MonthlyReport.from(...)` → `List`
+- `ContentView`: 4번째 탭(`chart.bar`) 추가
+- l10n ja/ko/en 7개 키(`report.*`) 추가
+- **정직 기록**: snapshot이 `nil`인 날(P1b 이전/오프라인)은 궂은날 카운트에서 제외 → 지표가 실제보다 작게 보일 수 있어 오해 소지 있는 분모("N회 중") 미표기
+
 ## 남은 작업
 
 ### P3 Widget (미착수)
@@ -59,6 +66,3 @@
 - WidgetKit small 위젯 (진도 링 + 추천 라벨), `WidgetCenter.reloadAllTimelines()`
 - **주의**: 위젯 익스텐션 타겟 추가 → pbxproj 구조 작업 큼
 
-### P4 Report (미착수)
-- 월간 요약 화면 ("비 예보일 재택 N회"). 스냅샷 데이터는 P1b부터 축적 중이라 소스는 준비됨
-- 순수 화면 1개, 상대적으로 가벼움

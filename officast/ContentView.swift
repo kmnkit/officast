@@ -22,6 +22,8 @@ struct ContentView: View {
                         .tabItem { Label("dashboard.title", systemImage: "cloud.sun") }
                     CalendarView()
                         .tabItem { Label("calendar.title", systemImage: "calendar") }
+                    ReportView()
+                        .tabItem { Label("report.title", systemImage: "chart.bar") }
                     SettingsView()
                         .tabItem { Label("settings.title", systemImage: "gearshape") }
                 }
