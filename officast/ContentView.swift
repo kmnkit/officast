@@ -2,54 +2,36 @@
 //  ContentView.swift
 //  officast
 //
-//  Created by Ginger Marco on 2026/08/15.
+//  Root gate: onboarding until set up, then the main tabs. Applies any pending
+//  notification check-in when the app becomes active.
 //
 
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Environment(AppSettings.self) private var settings
+    @Environment(\.modelContext) private var context
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        Group {
+            if settings.hasCompletedOnboarding {
+                TabView {
+                    DashboardView()
+                        .tabItem { Label("dashboard.title", systemImage: "cloud.sun") }
+                    CalendarView()
+                        .tabItem { Label("calendar.title", systemImage: "calendar") }
+                    SettingsView()
+                        .tabItem { Label("settings.title", systemImage: "gearshape") }
                 }
-                .onDelete(perform: deleteItems)
+            } else {
+                OnboardingView()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                MonthRepository.applyPendingCheckIn(settings: settings, context: context)
             }
         }
     }
@@ -57,5 +39,6 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .environment(AppSettings())
+        .modelContainer(for: [MonthRecord.self, DayRecord.self, WeatherCache.self], inMemory: true)
 }

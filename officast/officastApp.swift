@@ -7,12 +7,22 @@
 
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 @main
 struct officastApp: App {
+    @State private var settings = AppSettings()
+    private let notificationDelegate = AppNotificationDelegate()
+
+    init() {
+        UNUserNotificationCenter.current().delegate = notificationDelegate
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            MonthRecord.self,
+            DayRecord.self,
+            WeatherCache.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -26,6 +36,7 @@ struct officastApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environment(settings)
         }
         .modelContainer(sharedModelContainer)
     }
