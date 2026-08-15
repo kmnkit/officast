@@ -69,8 +69,11 @@ enum MonthRepository {
     /// Apply a pending notification check-in, seeding O from the existing month
     /// (or a sensible default) so a record always exists. Captures the weather
     /// snapshot from the cache when available (P1b).
-    static func applyPendingCheckIn(settings: AppSettings, context: ModelContext, calendar: Calendar = .current) {
-        guard let pending = PendingCheckIn.take() else { return }
+    static func applyPendingCheckIn(
+        settings: AppSettings, context: ModelContext,
+        calendar: Calendar = .current, defaults: UserDefaults = .standard
+    ) {
+        guard let pending = PendingCheckIn.take(defaults: defaults) else { return }
         let monthKey = DateKeys.monthKey(pending.date, calendar: calendar)
         let required = fetch(monthKey: monthKey, context: context)?.requiredOfficeDays ?? 0
         let snapshot = WeatherSnapshot.score(for: pending.date, settings: settings, context: context, calendar: calendar)

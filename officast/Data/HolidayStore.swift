@@ -21,6 +21,9 @@ final class HolidayStore {
     /// Holiday dates (start-of-day) that fall within `month`. Requests calendar
     /// access on first use; returns an empty set if access is denied or fails.
     func load(month: Date, calendar: Calendar = .current) async -> Set<Date> {
+        // Under UI test, skip EventKit so no calendar-permission dialog appears.
+        guard !UITestConfig.isActive else { return [] }
+
         let key = DateKeys.monthKey(month, calendar: calendar)
         if let cached = cache[key] { return cached }
 

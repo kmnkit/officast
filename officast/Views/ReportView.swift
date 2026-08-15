@@ -22,7 +22,11 @@ struct ReportView: View {
                 Section("report.progress") {
                     LabeledContent("report.officeDone",
                                    value: "\(report.officeDone) / \(report.requiredOfficeDays)")
+                        .accessibilityIdentifier("report.officeDone")
+                        .accessibilityValue("\(report.officeDone) / \(report.requiredOfficeDays)")
                     LabeledContent("report.wfhCount", value: "\(report.wfhCount)")
+                        .accessibilityIdentifier("report.wfhCount")
+                        .accessibilityValue("\(report.wfhCount)")
                 }
 
                 Section("report.insight") {
@@ -31,6 +35,8 @@ struct ReportView: View {
                     } icon: {
                         Image(systemName: "house.fill").foregroundStyle(.blue)
                     }
+                    .accessibilityIdentifier("report.roughDaysAvoided")
+                    .accessibilityValue("\(report.roughDaysAvoided)")
                     Text("report.roughDaysNote")
                         .font(.caption)
                         .foregroundStyle(.secondary)

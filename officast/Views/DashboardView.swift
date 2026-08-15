@@ -36,6 +36,7 @@ struct DashboardView: View {
             } actions: {
                 Button("common.retry") { Task { await refresh() } }
                     .buttonStyle(.glassProminent)
+                    .accessibilityIdentifier("dashboard.retry")
             }
         case .loaded(let data):
             loaded(data)
@@ -49,18 +50,22 @@ struct DashboardView: View {
                     Label("dashboard.offline", systemImage: "wifi.slash")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("dashboard.offlineBanner")
                 }
 
                 card("dashboard.progress", glass: false) {
                     VStack(spacing: 8) {
                         LabeledContent("dashboard.officeDone",
                                        value: "\(data.officeDone) / \(data.requiredOfficeDays)")
+                            .accessibilityIdentifier("dashboard.progress.officeDone")
+                            .accessibilityValue("\(data.officeDone) / \(data.requiredOfficeDays)")
                         LabeledContent("dashboard.remaining", value: "\(data.remainingWorkdays)")
                         LabeledContent("dashboard.slack", value: "\(data.slack)")
                         if data.slack < 0 {
                             Label("dashboard.slackWarning", systemImage: "exclamationmark.triangle.fill")
                                 .foregroundStyle(.orange)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                                .accessibilityIdentifier("dashboard.slackWarning")
                         }
                     }
                 }
@@ -68,12 +73,13 @@ struct DashboardView: View {
                 // Today is the one floating glass panel — the screen's focal point.
                 card("dashboard.today", glass: true) {
                     recommendationRow(data.today, showFlags: true, interpolated: data.todayInterpolated,
-                                      hasForecast: data.hasTodayForecast)
+                                      hasForecast: data.hasTodayForecast, idPrefix: "dashboard.today")
                 }
 
                 if let tomorrow = data.tomorrow {
                     card("dashboard.tomorrow", glass: false) {
-                        recommendationRow(tomorrow, showFlags: false, interpolated: false, hasForecast: true)
+                        recommendationRow(tomorrow, showFlags: false, interpolated: false, hasForecast: true,
+                                          idPrefix: "dashboard.tomorrow")
                     }
                 }
             }
@@ -107,11 +113,12 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func recommendationRow(
-        _ result: DecisionResult, showFlags: Bool, interpolated: Bool, hasForecast: Bool
+        _ result: DecisionResult, showFlags: Bool, interpolated: Bool, hasForecast: Bool, idPrefix: String
     ) -> some View {
         if !hasForecast {
             Label("dashboard.noForecast", systemImage: "questionmark.circle")
                 .foregroundStyle(.secondary)
+                .accessibilityIdentifier("\(idPrefix).noForecast")
         } else {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
@@ -119,6 +126,7 @@ struct DashboardView: View {
                         .foregroundStyle(tint(for: result))
                     Text(RecommendationPresentation.headline(result))
                         .font(.headline)
+                        .accessibilityIdentifier("\(idPrefix).option.\(RecommendationPresentation.optionIdentifier(result))")
                 }
                 Text(RecommendationPresentation.reason(result))
                     .font(.subheadline)
@@ -153,12 +161,12 @@ struct DashboardView: View {
     }
 
     private func refresh() async {
-        let monthKey = DateKeys.monthKey(Date())
+        let monthKey = DateKeys.monthKey(AppClock.now)
         let month = MonthRepository.upsert(
             monthKey: monthKey,
             requiredOfficeDays: MonthRepository.fetch(monthKey: monthKey, context: context)?.requiredOfficeDays ?? 0,
             context: context)
-        await model.refresh(settings: settings, month: month, context: context)
+        await model.refresh(settings: settings, month: month, context: context, now: AppClock.now)
         if case .loaded(let data) = model.state {
             scheduleMorningReminder(data)
         }

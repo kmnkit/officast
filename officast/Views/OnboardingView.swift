@@ -74,6 +74,7 @@ struct OnboardingView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("onboarding.save") { save() }
                         .disabled(!canSave)
+                        .accessibilityIdentifier("onboarding.save")
                 }
             }
         }
@@ -109,6 +110,8 @@ struct OnboardingView: View {
         settings.hasCompletedOnboarding = true
         AnalyticsLogger.completeOnboarding()
 
+        // Skip the notification-permission prompt under UI test.
+        guard !UITestConfig.isActive else { return }
         Task {
             if await NotificationScheduler.requestAuthorization() {
                 NotificationScheduler.registerCategory()

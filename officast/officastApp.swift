@@ -16,9 +16,15 @@ struct officastApp: App {
     private let notificationDelegate = AppNotificationDelegate()
 
     init() {
-        FirebaseApp.configure()
         UNUserNotificationCenter.current().delegate = notificationDelegate
-        BackgroundRefresh.register(container: sharedModelContainer, settings: AppSettings())
+        if UITestConfig.isActive {
+            // Hermetic UI-test launch: no Firebase, no background scheduling; seed
+            // a known state into the in-memory store instead.
+            TestSeeder.seed(container: sharedModelContainer)
+        } else {
+            FirebaseApp.configure()
+            BackgroundRefresh.register(container: sharedModelContainer, settings: AppSettings())
+        }
     }
 
     var sharedModelContainer: ModelContainer = {
@@ -27,7 +33,8 @@ struct officastApp: App {
             DayRecord.self,
             WeatherCache.self,
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(
+            schema: schema, isStoredInMemoryOnly: UITestConfig.isActive)
 
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])

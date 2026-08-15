@@ -41,7 +41,7 @@ final class DashboardModel {
     private let calendar: Calendar
 
     init(weather: WeatherFetching? = nil, calendar: Calendar = .current) {
-        self.weather = weather ?? OpenMeteoClient()
+        self.weather = weather ?? WeatherClientFactory.make()
         self.calendar = calendar
     }
 
@@ -194,7 +194,7 @@ final class DashboardModel {
     /// Best-effort background refresh: fetch today's home forecast and update the
     /// cache so the evening notification / offline fallback see fresh data (P2).
     static func refreshTodayCache(settings: AppSettings, container: ModelContainer, now: Date = Date()) async {
-        let client = OpenMeteoClient()
+        let client = WeatherClientFactory.make()
         guard let homeByDate = try? await client.fetchDailyHourly(
             latitude: settings.homeLat, longitude: settings.homeLng, forecastDays: forecastDays) else { return }
         cacheToday(homeByDate: homeByDate, now: now, calendar: .current, context: ModelContext(container))

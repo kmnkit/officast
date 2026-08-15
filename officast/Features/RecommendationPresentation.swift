@@ -18,6 +18,21 @@ enum RecommendationPresentation {
         }
     }
 
+    /// Stable, non-localized identifier for the recommended option — used as an
+    /// accessibility identifier so UI tests assert the decision independent of
+    /// language.
+    static func optionIdentifier(_ result: DecisionResult) -> String {
+        switch result.recommendation {
+        case .wfh: return "wfh"
+        case .office(let option):
+            switch option {
+            case .fullDay: return "officeFull"
+            case .amOnly: return "officeAM"
+            case .pmOnly: return "officePM"
+            }
+        }
+    }
+
     static func optionLabel(_ option: AttendanceOption) -> String {
         switch option {
         case .fullDay: return String(localized: "rec.office.full")

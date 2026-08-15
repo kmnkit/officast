@@ -52,15 +52,18 @@ struct SettingsView: View {
                         ), in: 0...31) {
                             LabeledContent("onboarding.required", value: "\(month.requiredOfficeDays)")
                         }
+                        .accessibilityIdentifier("settings.requiredDays")
                         Button("settings.resetMonth", role: .destructive) {
                             showingResetConfirm = true
                         }
+                        .accessibilityIdentifier("settings.reset")
                     }
                 }
             }
             .navigationTitle("settings.title")
             .confirmationDialog("settings.resetConfirm", isPresented: $showingResetConfirm, titleVisibility: .visible) {
                 Button("settings.resetMonth", role: .destructive) { resetMonth() }
+                    .accessibilityIdentifier("settings.reset.confirm")
                 Button("common.cancel", role: .cancel) {}
             }
         }

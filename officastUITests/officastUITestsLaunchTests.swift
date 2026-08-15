@@ -20,6 +20,9 @@ final class officastUITestsLaunchTests: XCTestCase {
     @MainActor
     func testLaunch() throws {
         let app = XCUIApplication()
+        // Launch hermetically (seeded + stubbed weather) so the screenshot is
+        // deterministic and doesn't depend on the live weather network.
+        app.launchEnvironment = ["UITEST": "1", "UITEST_WEATHER": "sunny", "UITEST_TODAY": "2026-06-15"]
         app.launch()
 
         // Insert steps here to perform after app launch but before taking a screenshot,

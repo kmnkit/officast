@@ -71,8 +71,10 @@ struct CalendarView: View {
                     Button(RecommendationPresentation.statusLabel(status)) {
                         setStatus(status, for: date)
                     }
+                    .accessibilityIdentifier("calendar.status.\(Self.statusToken(status))")
                 }
                 Button("calendar.clear", role: .destructive) { setStatus(.none, for: date) }
+                    .accessibilityIdentifier("calendar.status.clear")
                 Button("common.cancel", role: .cancel) {}
             }
         }
@@ -136,6 +138,13 @@ struct CalendarView: View {
             }
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("calendar.day.\(Self.dayIdentifier(date, calendar: calendar))")
+    }
+
+    /// Stable "yyyy-MM-dd" day key used as an accessibility identifier.
+    static func dayIdentifier(_ date: Date, calendar: Calendar) -> String {
+        let c = calendar.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
     }
 
     // MARK: - Data
@@ -161,6 +170,19 @@ struct CalendarView: View {
 
     private let statusChoices: [AttendanceStatus] =
         [.officeFull, .officeAM, .officePM, .wfh, .holiday, .vacation]
+
+    /// Stable, non-localized token for a status, used in accessibility identifiers.
+    static func statusToken(_ status: AttendanceStatus) -> String {
+        switch status {
+        case .officeFull: return "office"
+        case .officeAM: return "am"
+        case .officePM: return "pm"
+        case .wfh: return "wfh"
+        case .holiday: return "holiday"
+        case .vacation: return "vacation"
+        case .none: return "clear"
+        }
+    }
 
     private var statusDialogBinding: Binding<Bool> {
         Binding(get: { selectedDate != nil }, set: { if !$0 { selectedDate = nil } })
