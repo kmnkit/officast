@@ -1,0 +1,1 @@
+No login or account is required. All data is stored locally on device. Weather forecasts are fetched from Open-Meteo (no API key). The app self-reports office/WFH attendance; there is no server backend.

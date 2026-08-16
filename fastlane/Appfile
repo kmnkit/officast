@@ -1,0 +1,9 @@
+app_identifier("com.hobbylabo.officast")
+
+# Apple Developer 계정 이메일. 실제 로그인 이메일로 교체하세요.
+# apple_id("your-apple-id@example.com")
+
+team_id("7W8B42BG5D")
+
+# App Store Connect 팀 ID(여러 팀에 속한 경우에만 필요). 확인 후 주석 해제.
+# itc_team_id("")

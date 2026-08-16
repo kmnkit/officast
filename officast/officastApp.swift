@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 import UserNotifications
-import FirebaseCore
 
 @main
 struct officastApp: App {
@@ -18,11 +17,10 @@ struct officastApp: App {
     init() {
         UNUserNotificationCenter.current().delegate = notificationDelegate
         if UITestConfig.isActive {
-            // Hermetic UI-test launch: no Firebase, no background scheduling; seed
-            // a known state into the in-memory store instead.
+            // Hermetic UI-test launch: no background scheduling; seed a known state
+            // into the in-memory store instead.
             TestSeeder.seed(container: sharedModelContainer)
         } else {
-            FirebaseApp.configure()
             BackgroundRefresh.register(container: sharedModelContainer, settings: AppSettings())
         }
     }

@@ -1,0 +1,21 @@
+Officast helps hybrid workers spend their required office days on the good-weather days — and save working from home for the miserable ones.
+
+Your company asks you to be in the office a set number of days each month. Officast tracks how many you still owe, scores the weather along your morning and evening commute, and tells you each day whether to go in or work from home.
+
+WHY OFFICAST
+
+• Weather-smart recommendations. It scores the rain, snow, wind, and heat on your actual commute legs — not a generic citywide forecast.
+
+• The half-day cheat code. Heavy rain in the morning? Go in for the afternoon only. It still counts as a full office day, and you dodge the storm.
+
+• Stay on quota. See your progress — office days done vs. required — and exactly how many work-from-home days you can still afford this month.
+
+• Monthly report. Look back on how many rainy-forecast commutes you dodged.
+
+• Morning and evening reminders. A nudge before you leave, and a one-tap check-in at night that also previews tomorrow.
+
+PRIVATE BY DESIGN
+
+No account. No login. No cloud sync. Your office records stay on your device. Weather comes from Open-Meteo.
+
+Officast is a focused utility built for one job: making your "should I go in today?" decision automatic.

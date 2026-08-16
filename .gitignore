@@ -14,4 +14,3 @@ DerivedData/
 ## Swift Package Manager
 .build/
 .swiftpm/
-officast/GoogleService-Info.plist

@@ -31,6 +31,21 @@ enum UITestConfig {
     /// Start already onboarded (default) or at the onboarding screen.
     static var isOnboarded: Bool { env["UITEST_ONBOARDED"] != "0" }
 
+    /// Deep-links the main TabView to a specific tab at launch, e.g.
+    /// `UITEST_TAB=report`. Tapping the tab bar is unreliable across devices
+    /// (iPad renders a top tab bar, not a bottom one), so screenshots select
+    /// the tab deterministically here instead. Nil → default first tab.
+    static var initialTabIndex: Int? {
+        guard isActive else { return nil }
+        switch env["UITEST_TAB"] {
+        case "dashboard": return 0
+        case "calendar": return 1
+        case "report": return 2
+        case "settings": return 3
+        default: return nil
+        }
+    }
+
     static var weatherScenario: WeatherScenario? {
         WeatherScenario(rawValue: env["UITEST_WEATHER"] ?? "")
     }

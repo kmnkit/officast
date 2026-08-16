@@ -165,7 +165,6 @@ struct CalendarView: View {
         MonthRepository.setStatus(date: date, status: status,
                                   requiredOfficeDays: required, weatherScoreSnapshot: snapshot,
                                   context: context, calendar: calendar)
-        AnalyticsLogger.logAttendanceStatus(status)
     }
 
     private let statusChoices: [AttendanceStatus] =

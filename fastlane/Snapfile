@@ -1,0 +1,24 @@
+# App Store 스크린샷 자동 캡처 설정 (fastlane snapshot)
+# 헤르메틱 XCUITest 하네스(UITEST env)로 결정론적 화면을 캡처한다.
+
+# iPhone: 6.3" Pro로 캡처(6.9" Pro Max 미설치). 소스 해상도만 다르고 Next.js에서 폰
+# 목업에 합성하므로 무관.
+# iPad: 13" Pro는 세로 네이티브가 2064×2752로 App Store 13" iPad 규격과 정확히 일치.
+devices(["iPhone 17 Pro", "iPad Pro 13-inch (M5)"])
+
+# 스토어 등록 로케일: 일본어 + 영어.
+languages(["en-US", "ja"])
+
+scheme("officast")
+
+# 스크린샷 캡처 테스트만 실행.
+only_testing(["officastUITests/ScreenshotUITests"])
+
+output_directory("./fastlane/screenshots")
+clear_previous_screenshots(true)
+
+# 상태바를 깔끔하게 오버라이드(9:41, 풀 배터리 등).
+override_status_bar(true)
+
+# 캡처 후 HTML 요약 자동 오픈 비활성(CI 친화).
+skip_open_summary(true)

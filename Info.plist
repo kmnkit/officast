@@ -4,15 +4,15 @@
 <dict>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>processing</string>
+		<string>fetch</string>
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.hobbylabo.officast.eveningRefresh</string>
 	</array>
-	<key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
-	<true/>
 	<key>NSCalendarsFullAccessUsageDescription</key>
 	<string>달력에 지역 공휴일을 빨간색으로 표시하기 위해 캘린더 접근이 필요합니다.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

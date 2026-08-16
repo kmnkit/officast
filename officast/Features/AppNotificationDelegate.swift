@@ -26,6 +26,5 @@ final class AppNotificationDelegate: NSObject, UNUserNotificationCenterDelegate 
     ) async {
         guard let status = NotificationScheduler.status(forActionId: response.actionIdentifier) else { return }
         PendingCheckIn.store(date: Date(), status: status)
-        AnalyticsLogger.notificationCheckInTapped(status)
     }
 }

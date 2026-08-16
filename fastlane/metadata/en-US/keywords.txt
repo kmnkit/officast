@@ -1,0 +1,1 @@
+hybrid,wfh,work from home,commute,weather,office days,attendance,rain,forecast,remote,quota

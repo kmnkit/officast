@@ -108,7 +108,6 @@ struct OnboardingView: View {
         try? context.save()
 
         settings.hasCompletedOnboarding = true
-        AnalyticsLogger.completeOnboarding()
 
         // Skip the notification-permission prompt under UI test.
         guard !UITestConfig.isActive else { return }
