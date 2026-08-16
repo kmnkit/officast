@@ -59,6 +59,11 @@ struct SettingsView: View {
                         .accessibilityIdentifier("settings.reset")
                     }
                 }
+
+                Section("settings.about") {
+                    Link("settings.weatherCredit", destination: URL(string: "https://open-meteo.com/")!)
+                        .accessibilityIdentifier("settings.weatherCredit")
+                }
             }
             .navigationTitle("settings.title")
             .confirmationDialog("settings.resetConfirm", isPresented: $showingResetConfirm, titleVisibility: .visible) {
